@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.mindorks.example.coroutines.R
+import com.mindorks.example.coroutines.data.UserRepository
 import com.mindorks.example.coroutines.data.api.ApiHelperImpl
 import com.mindorks.example.coroutines.data.api.RetrofitBuilder
 import com.mindorks.example.coroutines.data.local.DatabaseBuilder
@@ -50,11 +51,15 @@ class TwoLongRunningTasksActivity : AppCompatActivity() {
     }
 
     private fun setupViewModel() {
+        val apiHelper = ApiHelperImpl(RetrofitBuilder.apiService)
+        val userDao = DatabaseHelperImpl(DatabaseBuilder.getInstance(applicationContext))
+
         viewModel = ViewModelProviders.of(
             this,
             ViewModelFactory(
-                ApiHelperImpl(RetrofitBuilder.apiService),
-                DatabaseHelperImpl(DatabaseBuilder.getInstance(applicationContext))
+                apiHelper,
+                userDao,
+                userRepository = UserRepository(apiHelper, userDao)
             )
         ).get(TwoLongRunningTasksViewModel::class.java)
     }

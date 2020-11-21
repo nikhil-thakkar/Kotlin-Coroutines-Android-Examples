@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mindorks.example.coroutines.R
+import com.mindorks.example.coroutines.data.UserRepository
 import com.mindorks.example.coroutines.data.api.ApiHelperImpl
 import com.mindorks.example.coroutines.data.api.RetrofitBuilder
 import com.mindorks.example.coroutines.data.local.DatabaseBuilder
@@ -74,11 +75,15 @@ class IgnoreErrorAndContinueActivity : AppCompatActivity() {
     }
 
     private fun setupViewModel() {
+        val apiHelper = ApiHelperImpl(RetrofitBuilder.apiService)
+        val userDao = DatabaseHelperImpl(DatabaseBuilder.getInstance(applicationContext))
+
         viewModel = ViewModelProviders.of(
             this,
             ViewModelFactory(
-                ApiHelperImpl(RetrofitBuilder.apiService),
-                DatabaseHelperImpl(DatabaseBuilder.getInstance(applicationContext))
+                apiHelper,
+                userDao,
+                userRepository = UserRepository(apiHelper, userDao)
             )
         ).get(IgnoreErrorAndContinueViewModel::class.java)
     }
